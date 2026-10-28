@@ -16,11 +16,13 @@ paths:
 
 # Style wording shared by every prompt. Tuned from the reference board:
 # soft rounded cartoon dinos, clean outlines, gentle shading, calm colors.
+# v2: the first test run drew scenery behind placement characters, so the
+# white background now comes first and scenery is in the negative prompt.
 style:
   placement: >-
-    children's picture book illustration, cute chubby baby dinosaur, big friendly eyes,
-    soft rounded shapes, clean dark outline, simple soft shading, gentle pastel colors,
-    centered, full body, isolated on plain white background
+    isolated on pure white background, sticker style children's picture book illustration,
+    cute chubby baby dinosaur, big friendly eyes, soft rounded shapes, clean dark outline,
+    simple soft shading, gentle pastel colors, centered, full body, nothing behind the character
   pattern: >-
     seamless repeating fabric pattern for kids pajamas, small cute cartoon dinosaurs
     scattered evenly with tiny stars and moons, flat illustration, clean outlines,
@@ -28,7 +30,8 @@ style:
   negative: >-
     text, letters, watermark, signature, logo, photo, photorealistic, 3d render,
     scary, sharp teeth, blood, angry, dark horror, blurry, jpeg artifacts,
-    extra limbs, deformed, cropped, frame, border
+    extra limbs, deformed, cropped, frame, border, scenery, landscape, trees, plants,
+    rocks, ground shadow
 
 # Prompt building blocks. generate_dataset.py takes the cross product.
 subjects:
