@@ -59,3 +59,9 @@ def test_style_config_builds_prompts():
     assert {m for m, _ in items} == {"placement", "pattern"}
     assert len(items) == 6 * 6 + 6 * 4
     assert s.build_prompt("pattern", "dinos").startswith(s.trigger)
+
+
+def test_sweet_config_builds_prompts():
+    s = load_style("configs/styles/sweet.yaml")
+    assert len(s.dataset_subjects()) == 6 * 6 + 6 * 4
+    assert s.trigger != load_style("configs/styles/dino.yaml").trigger
