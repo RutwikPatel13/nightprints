@@ -2,6 +2,11 @@
 
 No LoRA yet, so the trigger word is left out of prompts here. Each image gets
 a sidecar .json with its mode and subject, which caption.py uses later.
+
+Multi-GPU: run one process per GPU with --shard i/n and CUDA_VISIBLE_DEVICES=i.
+Each shard takes every n-th prompt, and file names and seeds come from the
+prompt's position in the full list, so shards never collide and the result is
+the same as a single-GPU run.
 """
 import argparse
 import json
@@ -12,25 +17,36 @@ from nightprints.models import generate, load_pipeline
 from nightprints.tiling import seam_score, set_tiling
 
 
+def parse_shard(s: str) -> tuple[int, int]:
+    i, n = (int(x) for x in s.split("/"))
+    if not 0 <= i < n:
+        raise argparse.ArgumentTypeError("shard must look like 0/2 or 1/2")
+    return i, n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--style", required=True)
     ap.add_argument("--per-prompt", type=int, default=2, help="seeds per prompt")
     ap.add_argument("--limit", type=int, default=0, help="stop after this many prompts (0 = all)")
     ap.add_argument("--steps", type=int, default=30)
+    ap.add_argument("--shard", type=parse_shard, default=(0, 1), help="i/n, e.g. 0/2")
     args = ap.parse_args()
 
     style = load_style(args.style)
     out = style.p("raw")
-    pipe = load_pipeline(style)
     max_seam = style["post"]["max_seam_score"]
+    shard_i, shard_n = args.shard
 
     items = style.dataset_subjects()
     if args.limit:
         items = items[: args.limit]
+    mine = [(idx, m, s) for idx, (m, s) in enumerate(items) if idx % shard_n == shard_i]
 
+    pipe = load_pipeline(style)
+    tag = f"[shard {shard_i}/{shard_n}]" if shard_n > 1 else ""
     made = skipped = 0
-    for idx, (mode, subject) in enumerate(items):
+    for done, (idx, mode, subject) in enumerate(mine, start=1):
         set_tiling(pipe, mode == "pattern")
         prompt = style.build_prompt(mode, subject, with_trigger=False)
         for k in range(args.per_prompt):
@@ -48,9 +64,9 @@ def main():
             img.save(out / f"{name}.png")
             (out / f"{name}.json").write_text(json.dumps(meta, indent=2))
             made += 1
-        print(f"[{idx + 1}/{len(items)}] {mode}: {subject}  (kept {made}, seam-rejected {skipped})")
+        print(f"{tag}[{done}/{len(mine)}] {mode}: {subject}  (kept {made}, seam-rejected {skipped})", flush=True)
 
-    print(f"done: {made} images in {out}")
+    print(f"{tag} done: {made} images in {out}")
 
 
 if __name__ == "__main__":
