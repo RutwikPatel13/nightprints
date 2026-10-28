@@ -15,7 +15,7 @@ from generate import make_prints  # noqa: E402
 from nightprints.config import load_style  # noqa: E402
 from nightprints.models import load_pipeline  # noqa: E402
 from nightprints.post import save_print  # noqa: E402
-from nightprints.tiling import preview_repeat  # noqa: E402
+from nightprints.mockup import mockup  # noqa: E402
 
 
 def main():
@@ -36,8 +36,8 @@ def main():
         for i, (final, raw, _) in enumerate(make_prints(pipe, style, mode, theme, int(n), int(seed))):
             path = save_print(final, tmp / f"{mode}_{i}.png", dpi)
             files.append(str(path))
-            shown = preview_repeat(raw, 2) if mode == "pattern" else final
-            gallery.append(shown)
+            final.info["dpi"] = (dpi, dpi)  # so the mockup shows the real repeat size
+            gallery.append(mockup(final, mode))
         return gallery, files
 
     with gr.Blocks(title="nightprints") as demo:
@@ -49,7 +49,7 @@ def main():
             n = gr.Slider(1, 4, value=2, step=1, label="How many")
             seed = gr.Number(value=0, label="Seed (change for new options)", precision=0)
             go = gr.Button("Generate", variant="primary")
-        gallery = gr.Gallery(label="Preview (patterns shown repeated 2x2)", columns=2, height=600)
+        gallery = gr.Gallery(label="Preview on a nightdress and pajama set", columns=1, height=700)
         files = gr.File(label="Print-ready files, 300 DPI", file_count="multiple")
         go.click(run, [theme, mode, n, seed], [gallery, files])
 

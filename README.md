@@ -2,7 +2,7 @@
 
 A LoRA-based print generator for kids nightwear. You type a theme like "sleepy dinosaurs under the stars" and get print-ready files back: a seamless all-over tile for the fabric, or a single character with a transparent background for a front placement print.
 
-The first style family is dinosaurs, since that's the biggest part of the reference board (Dino Clipart plus Space Dinosaurs, 46 of 75 pins). Cherries, bows and hearts come next as a second LoRA once the pipeline works end to end.
+The first style family is dinosaurs, since that's the biggest part of the reference board (Dino Clipart plus Space Dinosaurs, 46 of 75 pins). The second, `sweet` (cherries, bows and hearts), has its config ready in `configs/styles/sweet.yaml` and trains as its own LoRA with the same scripts.
 
 Everything here runs on free tools. See [docs/cost.md](docs/cost.md).
 
@@ -21,10 +21,12 @@ Pattern mode switches every conv layer in the UNet and VAE to circular padding, 
 
 Post-processing for each output: optional background removal (placement only), palette reduction to a fixed number of colors, a wrap-safe upscale, and export at 300 DPI.
 
+Every print also gets a mockup on a kids nightdress and pajama set, drawn at real-world scale so the repeat size looks the way it will on fabric. The app shows these by default, and `scripts/mockup.py` makes one for any image.
+
 ## Quick start (Kaggle, free)
 
 1. Push this repo to GitHub.
-2. On kaggle.com, create a notebook, set Accelerator to GPU T4, and turn Internet on (needs a verified phone number on your account).
+2. On kaggle.com, create a notebook, set Accelerator to GPU T4 x2, and turn Internet on (needs a verified phone number on your account). Generation and training both use the two GPUs.
 3. Upload `notebooks/kaggle_pipeline.ipynb`, set `REPO_URL` in the first cell, and run the cells top to bottom. The curation cell gives you a public Gradio link to pick keepers from your phone or laptop.
 
 ## Running pieces by hand
@@ -40,6 +42,7 @@ python scripts/eval.py  --style configs/styles/dino.yaml --lora outputs/lora/din
 python scripts/generate.py --style configs/styles/dino.yaml --lora outputs/lora/dino \
        --mode pattern --theme "sleepy baby t-rex with moons and stars" --n 4
 python app.py --style configs/styles/dino.yaml --lora outputs/lora/dino
+python scripts/mockup.py some_print.png --mode pattern   # nightdress + pajama preview
 ```
 
 Post-processing and the seam check run fine on a Mac without a GPU. Generation on Apple Silicon works through MPS but is slow, a minute or more per image.
@@ -55,7 +58,7 @@ data/raw             generated candidates (gitignored)
 data/curated         images you kept (gitignored)
 data/train           curated images + metadata.jsonl, fed to training (gitignored)
 outputs/             LoRA weights, eval reports, generated prints (gitignored)
-docs/                style guide, cost breakdown, notes
+docs/                style guide, cost breakdown, printer handoff checklist
 ```
 
 ## About the training data

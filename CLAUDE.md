@@ -14,7 +14,7 @@ A print generator for kids nightdresses and pajamas, built for a friend who sell
 
 ## Style families
 - `dino` (current): see configs/styles/dino.yaml and docs/style-guide.md.
-- `sweet` (next): cherries, bows, hearts. Separate LoRA. Do not mix with dino.
+- `sweet` (next): cherries, bows, hearts. Config in configs/styles/sweet.yaml. Separate LoRA. Do not mix with dino.
 
 ## Conventions
 - Python 3.10+, type hints, small functions. Library code in `src/nightprints`, entry points in `scripts/`.
@@ -34,11 +34,16 @@ Finish and test one phase before starting the next. When a phase is done, update
 ## Status
 | Phase | State |
 |---|---|
-| 1 Dataset | scripts written, not yet run |
-| 2 Training | scripts written, not yet run |
+| 1 Dataset | dino: 12-image test passed, full 300-image run on 2 GPUs in progress |
+| 2 Training | multi-GPU train.sh written, not yet run |
 | 3 Eval | scripts written, not yet run |
-| 4 App | scripts written, not yet run |
-| 5 Sweet style | not started |
+| 4 App | app + nightdress/pajama mockups written, mockups tested on CPU |
+| 5 Sweet style | config written, not yet generated |
 
 ## Testing
-- `python -m pytest tests/` covers tiling helpers, seam metric and post-processing on CPU.
+- `python -m pytest tests/` covers tiling helpers, seam metric, post-processing, configs and mockups on CPU.
+
+## Known gotchas
+- Kaggle runs a newer diffusers: VAE slicing lives on `pipe.vae`, not the pipeline. models.py handles both.
+- In notebook `!` cells, IPython treats `{...}` as Python. Use `( ... )` subshells, not `{ ...; }` groups.
+- Base SDXL ignores "white background" unless it comes first in the prompt and scenery is in the negative.
