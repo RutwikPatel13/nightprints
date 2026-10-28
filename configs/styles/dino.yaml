@@ -61,8 +61,12 @@ post:
   dpi: 300
   max_seam_score: 1.5    # reject tiles whose seam is rougher than the busiest 10% of the interior
 
+# ~35 curated images x effective batch 4 x 800 steps = about 90 views per image.
+# Much more than that and a style LoRA starts copying its training images.
+# Checkpoints let compare_checkpoints.py pick the best point instead of the last.
 train:
-  steps: 1500
+  steps: 800
+  checkpoint_every: 200
   lr: 1.0e-4
   rank: 16
   grad_accum: 4
