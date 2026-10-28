@@ -5,7 +5,8 @@ the format the diffusers training script reads (file_name, text).
 
 Captions come from the prompt that made each image, so no captioning model
 is needed. The trigger word goes first so the LoRA ties the style to it.
-Images without a sidecar .json (ones you added yourself) get a generic caption.
+Images without a sidecar .json (ones you added yourself) get the style's
+fallback_caption from its YAML.
 """
 import argparse
 import json
@@ -14,7 +15,7 @@ import shutil
 import _bootstrap  # noqa: F401
 from nightprints.config import load_style
 
-FALLBACK = "cute cartoon dinosaur illustration"
+DEFAULT_FALLBACK = "kids nightwear illustration"
 
 
 def main():
@@ -36,7 +37,7 @@ def main():
             kind = "seamless pattern" if meta["mode"] == "pattern" else "character"
             text = f"{style.trigger}, {kind}, {meta['subject']}"
         else:
-            text = f"{style.trigger}, {FALLBACK}"
+            text = f"{style.trigger}, {style.raw.get('fallback_caption', DEFAULT_FALLBACK)}"
         shutil.copy2(p, train / p.name)
         rows.append({"file_name": p.name, "text": text})
 

@@ -13,6 +13,7 @@ from datetime import datetime
 import _bootstrap  # noqa: F401
 from nightprints.config import load_style
 from nightprints.models import generate, load_pipeline
+from nightprints.mockup import mockup
 from nightprints.post import finish, save_print
 from nightprints.tiling import preview_repeat, seam_score, set_tiling
 
@@ -67,6 +68,8 @@ def main():
         raw.save(out / f"{i}_raw.png")
         if args.mode == "pattern":
             preview_repeat(raw, 3).resize((1536, 1536)).save(out / f"{i}_repeat_preview.png")
+        final.info["dpi"] = (style["post"]["dpi"],) * 2
+        mockup(final, args.mode).save(out / f"{i}_mockup.png")
         (out / f"{i}.json").write_text(json.dumps(info, indent=2))
         print(f"saved {out / f'{i}_print.png'}  {info.get('seam_score', '')}")
 
