@@ -1,0 +1,9 @@
+data/raw/*
+data/curated/*
+data/train/*
+outputs/*
+!**/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+weights/
