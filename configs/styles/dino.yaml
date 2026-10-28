@@ -1,0 +1,79 @@
+name: dino
+trigger: npdino style   # rare token pair the LoRA learns as "this style"
+
+model:
+  base: stabilityai/stable-diffusion-xl-base-1.0
+  vae: madebyollin/sdxl-vae-fp16-fix
+  resolution: 1024
+
+paths:
+  raw: data/raw/dino
+  curated: data/curated/dino
+  train: data/train/dino
+  lora: outputs/lora/dino
+  eval: outputs/eval/dino
+  prints: outputs/prints/dino
+
+# Style wording shared by every prompt. Tuned from the reference board:
+# soft rounded cartoon dinos, clean outlines, gentle shading, calm colors.
+style:
+  placement: >-
+    children's picture book illustration, cute chubby baby dinosaur, big friendly eyes,
+    soft rounded shapes, clean dark outline, simple soft shading, gentle pastel colors,
+    centered, full body, isolated on plain white background
+  pattern: >-
+    seamless repeating fabric pattern for kids pajamas, small cute cartoon dinosaurs
+    scattered evenly with tiny stars and moons, flat illustration, clean outlines,
+    limited color palette, evenly spaced, no overlap
+  negative: >-
+    text, letters, watermark, signature, logo, photo, photorealistic, 3d render,
+    scary, sharp teeth, blood, angry, dark horror, blurry, jpeg artifacts,
+    extra limbs, deformed, cropped, frame, border
+
+# Prompt building blocks. generate_dataset.py takes the cross product.
+subjects:
+  - baby t-rex
+  - triceratops
+  - stegosaurus
+  - long-neck brontosaurus
+  - pterodactyl
+  - baby dinosaur hatching from an egg
+actions:
+  - sleeping curled up
+  - yawning in pajamas
+  - hugging a teddy bear
+  - wearing a little astronaut helmet
+  - sitting on a crescent moon
+  - holding a star
+backgrounds:            # pattern mode only
+  - soft cream background
+  - pale sky blue background
+  - deep navy night sky background
+  - mint green background
+
+post:
+  palette_colors: 8      # reduce to this many colors for clean fabric printing
+  upscale: 4             # 1024 -> 4096 px
+  dpi: 300
+  max_seam_score: 1.5    # reject tiles whose seam is rougher than the busiest 10% of the interior
+
+train:
+  steps: 1500
+  lr: 1.0e-4
+  rank: 16
+  grad_accum: 4
+  seed: 42
+
+eval_prompts:
+  placement:
+    - baby t-rex sleeping under a blanket
+    - triceratops reading a bedtime book
+    - stegosaurus wearing a nightcap
+    - pterodactyl flying past the moon
+    - baby dinosaur brushing its teeth
+  pattern:
+    - sleepy dinosaurs with moons and stars
+    - dinosaurs and clouds
+    - astronaut dinosaurs and planets
+    - baby dinosaurs and eggs
+    - dinosaurs and teddy bears
