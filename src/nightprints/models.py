@@ -31,7 +31,11 @@ def load_pipeline(style: Style, lora: str | Path | None = None):
         pipe.load_lora_weights(str(lora), adapter_name="style")
     pipe.to(device)
     if device == "cuda":
-        pipe.enable_vae_slicing()
+        # Newer diffusers moved this from the pipeline onto the VAE.
+        if hasattr(pipe, "enable_vae_slicing"):
+            pipe.enable_vae_slicing()
+        elif hasattr(pipe.vae, "enable_slicing"):
+            pipe.vae.enable_slicing()
     pipe.set_progress_bar_config(disable=True)
     return pipe
 
