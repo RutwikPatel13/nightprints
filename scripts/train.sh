@@ -26,6 +26,7 @@ LR=$(read_cfg "['train']['lr']")
 RANK=$(read_cfg "['train']['rank']")
 ACCUM=$(read_cfg "['train']['grad_accum']")
 SEED=$(read_cfg "['train']['seed']")
+CKPT=$(read_cfg "['train'].get('checkpoint_every', 500)")
 
 ACCUM=$(( ACCUM / NUM_GPUS ))
 [ "$ACCUM" -ge 1 ] || ACCUM=1
@@ -60,11 +61,12 @@ accelerate launch $MULTI --mixed_precision=fp16 --num_processes="$NUM_GPUS" --nu
   --lr_warmup_steps=0 \
   --rank="$RANK" \
   --max_train_steps="$STEPS" \
-  --checkpointing_steps=500 \
+  --checkpointing_steps="$CKPT" \
   --seed="$SEED" \
   --validation_prompt="$TRIGGER, character, baby t-rex sleeping under a blanket" \
   --validation_epochs=50 \
   --output_dir="$OUT_DIR" \
   --report_to=tensorboard
 
-echo "LoRA saved to $OUT_DIR/pytorch_lora_weights.safetensors"
+echo "LoRA saved to $OUT_DIR/pytorch_lora_weights.safetensors (checkpoints every $CKPT steps in $OUT_DIR/checkpoint-*)"
+echo "pick the best one with: python scripts/compare_checkpoints.py --style $STYLE"
