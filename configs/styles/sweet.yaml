@@ -1,0 +1,80 @@
+name: sweet
+trigger: npsweet style   # separate trigger so it never mixes with the dino LoRA
+fallback_caption: coquette cherry and bow illustration
+
+model:
+  base: stabilityai/stable-diffusion-xl-base-1.0
+  vae: madebyollin/sdxl-vae-fp16-fix
+  resolution: 1024
+
+paths:
+  raw: data/raw/sweet
+  curated: data/curated/sweet
+  train: data/train/sweet
+  lora: outputs/lora/sweet
+  eval: outputs/eval/sweet
+  prints: outputs/prints/sweet
+
+# From the cherry, bow and heart sections of the reference board: glossy red
+# cherries, soft pink ribbon bows, tiny hearts, sparse and airy, cream and blush
+# grounds with one deep cherry red option. Motifs, not characters.
+style:
+  placement: >-
+    isolated on pure white background, sticker style illustration for a little girl's nightdress,
+    coquette aesthetic, glossy red and soft pink, clean dark outline, simple soft shading,
+    centered, nothing behind the motif
+  pattern: >-
+    seamless repeating fabric pattern for kids pajamas, small coquette motifs scattered sparsely
+    and evenly, lots of empty space between motifs, flat illustration, clean outlines,
+    limited palette of cherry red, blush pink and cream, evenly spaced, no overlap
+  negative: >-
+    text, letters, watermark, signature, logo, photo, photorealistic, 3d render, people, faces,
+    animals, dinosaur, blurry, jpeg artifacts, cropped, frame, border, scenery, cluttered,
+    dense, busy, gradient background
+
+subjects:
+  - pair of glossy red cherries
+  - pink satin ribbon bow
+  - little red heart
+  - cherries tied with a pink bow
+  - strawberry
+  - heart-shaped locket
+actions:                 # placement: small variations on each motif
+  - with tiny sparkles around it
+  - with three little hearts
+  - with a long trailing ribbon
+  - in a small cluster of three
+  - with tiny white polka dots
+  - with a scalloped lace edge
+backgrounds:             # pattern mode only
+  - creamy white background
+  - soft blush pink background
+  - deep cherry red background
+  - warm beige linen background
+
+post:
+  palette_colors: 6      # this style uses fewer colors than dino
+  upscale: 4
+  dpi: 300
+  max_seam_score: 1.5
+
+train:
+  steps: 1500
+  lr: 1.0e-4
+  rank: 16
+  grad_accum: 4
+  seed: 42
+
+eval_prompts:
+  placement:
+    - pair of cherries with a pink bow
+    - big pink bow with hearts
+    - red heart with lace trim
+    - strawberry with tiny leaves
+    - cherry and heart together
+  pattern:
+    - tiny cherries and bows
+    - scattered little hearts
+    - pink bows and polka dots
+    - cherries and sparkles
+    - strawberries and hearts

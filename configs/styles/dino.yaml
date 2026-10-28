@@ -1,5 +1,6 @@
 name: dino
 trigger: npdino style   # rare token pair the LoRA learns as "this style"
+fallback_caption: cute cartoon dinosaur illustration
 
 model:
   base: stabilityai/stable-diffusion-xl-base-1.0
